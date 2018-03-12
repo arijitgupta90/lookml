@@ -1,0 +1,6 @@
+view: omniture_data
+
+dimension: Video Start
+description: "event 15"
+type: number
+sql: $(TABLE).e15_Video_Start

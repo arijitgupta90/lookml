@@ -1,0 +1,298 @@
+label: "Blazerlytics"
+#######################
+    # PRODUCTS #
+#######################
+explore: products_blazerlytics {
+  label: "Products"
+  view_label: "Product Descriptors"
+
+  join: merch_products_blazerlytics {
+    view_label: "Product Descriptors"
+    type: left_outer
+    relationship: one_to_one
+    sql_on: ${products_blazerlytics.left_11} = ${merch_products_blazerlytics.left_11} ;;
+    fields: [merch_products_blazerlytics.merch_dimensions*]
+ }
+  join: dates {
+    view_label: "Dates"
+    type: left_outer
+    relationship: one_to_one
+    sql_on: ${merch_products_blazerlytics.debut_date} = ${dates.calendar_date};;
+    fields: [dates.lw_vs_ly_lw,
+      dates.mtd_vs_ly_mtd,
+      dates.qtd_vs_ly_qtd,
+      dates.std_vs_ly_std,
+      dates.ytd_vs_ly_ytd,
+      dates.lw_vs_ly_lw,
+      dates.date_dimensions_main*]
+  }
+
+  join: stock_locations_blazerlytics {
+    view_label: "Inventory"
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${sale_blazerlytics.stock_location_id} = ${stock_locations_blazerlytics.stock_location_id} ;;
+  }
+  join: in_stock_fact_blazerlytics {
+    view_label: "Inventory"
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${products_blazerlytics.sku} = ${in_stock_fact_blazerlytics.sku};;
+  }
+  join: inventory_fact_blazerlytics {
+    view_label: "Inventory"
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${products_blazerlytics.sku} = ${inventory_fact_blazerlytics.sku} and ${dates.calendar_date} = ${inventory_fact_blazerlytics.as_of_date} ;;
+  }
+  join: tag_inventory_fact_blazerlytics {
+    view_label: "Inventory"
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${products_blazerlytics.sku} = ${tag_inventory_fact_blazerlytics.sku} and ${dates.calendar_date} = ${tag_inventory_fact_blazerlytics.report_date};;
+  }
+  join: sale_blazerlytics {
+    view_label: "Sale Metrics"
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${products_blazerlytics.sku} = ${sale_blazerlytics.sku} ;;
+    fields: [sale_blazerlytics.sale_required*]
+  }
+  join: return_blazerlytics {
+    view_label: "Sale Metrics"
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${sale_blazerlytics.order_item_key} = ${return_blazerlytics.table_key} ;;
+    fields: [return_blazerlytics.product*]
+  }
+  join: order_blazerlytics {
+    view_label: "Product Descriptors"
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${sale_blazerlytics.order_key} = ${order_blazerlytics.order_key} ;;
+    fields: [order_blazerlytics.products*]
+  }
+  join: customer_blazerlytics {
+    view_label: "Customer Descriptors"
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${sale_blazerlytics.customer_key} = ${customer_blazerlytics.customer_key} ;;
+    fields: [customer_blazerlytics.descriptors*]
+  }
+  join: customer_atrb_blazerlytics {
+    type: left_outer
+    relationship: one_to_one
+    sql_on: ${customer_blazerlytics.customer_key} = ${customer_atrb_blazerlytics.customer_key} ;;
+    fields: [customer_atrb_blazerlytics.descriptors*]
+  }
+
+  join: sk_customer_blazerlytics {
+    type: left_outer
+    relationship: one_to_one
+    sql_on: ${customer_blazerlytics.customer_key} = ${sk_customer_blazerlytics.customer_key} ;;
+  }
+
+}
+
+ #######################
+       # ORDERS #
+ #######################
+
+explore: order_blazerlytics {
+  label: "Orders"
+
+  join: return_blazerlytics {
+    view_label: "Return Summary"
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${sale_blazerlytics.order_item_key} = ${return_blazerlytics.table_key} ;;
+    fields: [return_blazerlytics.order*]
+  }
+  join: products_blazerlytics {
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${sale_blazerlytics.sku} = ${products_blazerlytics.sku} ;;
+    fields: [products_blazerlytics.order*]
+  }
+
+  join: sale_blazerlytics {
+    view_label: "Financial Metrics"
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${order_blazerlytics.order_key} = ${sale_blazerlytics.order_key} ;;
+    fields: [sale_blazerlytics.order*, sale_blazerlytics.measures*]
+  }
+  join: dates {
+    view_label: "Dates"
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${order_blazerlytics.order_date} = ${dates.calendar_date};;
+    fields: [dates.lw_vs_ly_lw,
+      dates.mtd_vs_ly_mtd,
+      dates.qtd_vs_ly_qtd,
+      dates.std_vs_ly_std,
+      dates.ytd_vs_ly_ytd,
+      dates.lw_vs_ly_lw,
+      dates.date_dimensions_main*]
+  }
+  join: customer_blazerlytics {
+    view_label: "Customer Descriptors"
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${sale_blazerlytics.customer_key} = ${customer_blazerlytics.customer_key} ;;
+    fields: [customer_blazerlytics.descriptors*]
+  }
+  join: customer_atrb_blazerlytics {
+    type: left_outer
+    relationship: one_to_one
+    sql_on: ${customer_blazerlytics.customer_key} = ${customer_atrb_blazerlytics.customer_key} ;;
+    fields: [customer_atrb_blazerlytics.descriptors*]
+  }
+
+  join: sk_customer_blazerlytics {
+    type: left_outer
+    relationship: one_to_one
+    sql_on: ${customer_blazerlytics.customer_key} = ${sk_customer_blazerlytics.customer_key} ;;
+  }
+}
+
+ #######################
+       # RETURNS #
+ #######################
+
+explore: return_blazerlytics {
+  label: "Returns"
+
+  join: sale_blazerlytics {
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${return_blazerlytics.table_key} = ${sale_blazerlytics.order_item_key} ;;
+    fields: [sale_blazerlytics.returns*]
+  }
+
+  join: order_blazerlytics {
+    view_label: "     Dates"
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${sale_blazerlytics.order_key} = ${order_blazerlytics.order_key} ;;
+    fields: [order_blazerlytics.return_dates*]
+  }
+
+  join: rma_result_fact_blazerlytics {
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${return_blazerlytics.orig_order_id} = ${rma_result_fact_blazerlytics.orig_order_id} ;;
+  }
+  join: dates {
+    view_label: "     Dates"
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${return_blazerlytics.creditmemo_date} = ${dates.calendar_date} ;;
+    fields: [dates.lw_vs_ly_lw,
+      dates.mtd_vs_ly_mtd,
+      dates.qtd_vs_ly_qtd,
+      dates.std_vs_ly_std,
+      dates.ytd_vs_ly_ytd,
+      dates.lw_vs_ly_lw,
+      dates.date_dimensions_main*]
+  }
+  join: products_blazerlytics {
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${sale_blazerlytics.sku} = ${products_blazerlytics.sku} ;;
+    view_label: "Product Descriptors"
+    fields: [products_blazerlytics.returns*]
+  }
+  join: merch_products_blazerlytics {
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${products_blazerlytics.left_11} = ${merch_products_blazerlytics.left_11} ;;
+    view_label: "Product Descriptors"
+    fields: [merch_products_blazerlytics.returns*]
+  }
+  join: customer_blazerlytics {
+    view_label: "Customer Descriptors"
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${return_blazerlytics.customer_key} = ${customer_blazerlytics.customer_key} ;;
+    fields: [customer_blazerlytics.descriptors*]
+  }
+  join: customer_atrb_blazerlytics {
+    type: left_outer
+    relationship: one_to_one
+    sql_on: ${customer_blazerlytics.customer_key} = ${customer_atrb_blazerlytics.customer_key} ;;
+    fields: [customer_atrb_blazerlytics.descriptors*]
+  }
+
+  join: sk_customer_blazerlytics {
+    type: left_outer
+    relationship: one_to_one
+    sql_on: ${customer_blazerlytics.customer_key} = ${sk_customer_blazerlytics.customer_key} ;;
+  }
+}
+
+ #######################
+       # CUSTOMERS #
+ #######################
+
+explore: customer_blazerlytics {
+  label: "Customers"
+
+  join: customer_atrb_blazerlytics {
+    type: left_outer
+    relationship: one_to_one
+    sql_on: ${customer_blazerlytics.customer_key} = ${customer_atrb_blazerlytics.customer_key} ;;
+  }
+
+  join: sk_customer_blazerlytics {
+    type: left_outer
+    relationship: one_to_one
+    sql_on: ${customer_blazerlytics.customer_key} = ${sk_customer_blazerlytics.customer_key} ;;
+  }
+
+  join: clv_forecast_blazerlytics {
+    type: inner
+    relationship: one_to_many
+    sql_on: ${customer_blazerlytics.customer_key} = ${clv_forecast_blazerlytics.customer_key} ;;
+  }
+
+  join: sale_blazerlytics {
+    type: left_outer
+    relationship: many_to_one
+    view_label: "Order Summary Metrics"
+    sql_on: ${customer_blazerlytics.customer_key} = ${sale_blazerlytics.customer_key};;
+    fields: [sale_blazerlytics.customers*]
+  }
+
+  join: order_blazerlytics {
+    type: left_outer
+    relationship: many_to_one
+    view_label: "Order Summary Metrics"
+    sql_on: ${sale_blazerlytics.order_key} = ${order_blazerlytics.order_key} ;;
+    fields: [order_blazerlytics.customers*]
+  }
+
+  join: return_blazerlytics {
+    type: left_outer
+    relationship: many_to_one
+    view_label: "Return Summary Metrics"
+    sql_on: ${sale_blazerlytics.order_item_key} = ${return_blazerlytics.table_key} ;;
+    fields: [return_blazerlytics.customers*]
+  }
+
+  join: products_blazerlytics {
+    type: left_outer
+    relationship: many_to_one
+    view_label: "Product Summary Metrics"
+    sql_on: ${sale_blazerlytics.sku} = ${products_blazerlytics.sku} ;;
+    fields: [products_blazerlytics.customers*]
+  }
+
+  join: merch_products_blazerlytics {
+    type: left_outer
+    relationship: one_to_one
+    view_label: "Product Summary Metrics"
+    sql_on: ${products_blazerlytics.left_11} = ${merch_products_blazerlytics.left_11} ;;
+    fields: [merch_products_blazerlytics.customers*]
+  }
+}
